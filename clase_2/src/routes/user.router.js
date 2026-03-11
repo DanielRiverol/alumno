@@ -12,6 +12,19 @@ router.get("/", async (req, res) => {
       .json({ message: "Error interno del servidor", error: error.message });
   }
 });
+router.get("/profile", async (req, res) => {
+  try {
+    const user = req.session?.user;
+    if (!user)
+      return res.status(401).json({ message: "Debes iniciar sesion primero" });
+    res.status(200).json({ message: "Perfil del usuario", payload: user });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error interno del servidor", error: error.message });
+  }
+});
+
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
   try {
