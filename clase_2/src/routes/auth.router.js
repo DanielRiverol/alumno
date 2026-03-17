@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { comparePassword } from "../utils/auth.js";
 import userModel from "../models/user.model.js";
 
 const router = Router();
@@ -9,7 +10,9 @@ router.post("/login", async (req, res) => {
     // validar si recibimos todos los datos
 
     const user = await userModel.findOne({ email });
-    if (!user || user.password !== password)
+    const isValidPassword = await comparePassword(password, user.password)
+    
+    if (!user || !isValidPassword)
       return res.status(401).json({ message: "Email o passowod invalidos" });
 
     req.session.user = {

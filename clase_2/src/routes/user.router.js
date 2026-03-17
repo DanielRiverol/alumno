@@ -1,5 +1,6 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
+import { hashPassword } from "../utils/auth.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
@@ -28,7 +29,8 @@ router.get("/profile", async (req, res) => {
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const newUser = await userModel.create({ email, password });
+    const passHash = await hashPassword(password);
+    const newUser = await userModel.create({ email, password: passHash });
     res
       .status(201)
       .json({ message: "Usuario creado correctamente", payload: newUser });
