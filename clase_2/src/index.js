@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import FileStore from "session-file-store";
@@ -7,12 +7,14 @@ import MongoStore from "connect-mongo";
 import userRoutes from "./routes/user.router.js";
 import authRoutes from "./routes/auth.router.js";
 import connectDb from "./config/db.js";
-dotenv.config();
+
+import { env } from "./config/env.js";
+// console.log(env);
 
 //settings
 const app = express();
-app.set("PORT", process.env.PORT);
-const secret = process.env.SECRET;
+app.set("PORT", env.port);
+const secret = env.session_secret;
 const fileStore = FileStore(session);
 
 // middlewares
@@ -30,7 +32,7 @@ app.use(cookieParser());
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl: process.env.DB_URI,
+      mongoUrl: env.db_uri,
       ttl: 60000,
     }),
     secret,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
 import { hashPassword } from "../utils/auth.js";
-import {isAuth}from '../middlewares/auth.middleware.js'
+import { isAuth } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
@@ -15,6 +15,7 @@ router.get("/", async (req, res) => {
   }
 });
 router.get("/profile", isAuth, async (req, res) => {
+
   try {
     const user = req.session?.user;
     if (!user)
