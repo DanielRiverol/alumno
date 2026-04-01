@@ -1,5 +1,6 @@
 import express from "express";
 
+import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import FileStore from "session-file-store";
@@ -7,7 +8,7 @@ import MongoStore from "connect-mongo";
 import userRoutes from "./routes/user.router.js";
 import authRoutes from "./routes/auth.router.js";
 import connectDb from "./config/db.js";
-
+import initializePassport from "./middlewares/passport.config.js";
 import { env } from "./config/env.js";
 // console.log(env);
 
@@ -21,6 +22,7 @@ const fileStore = FileStore(session);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 // app.use(
 //   session({
 //     store: new fileStore({ path: "./sessions", ttl: 100, retries: 0 }),
@@ -40,6 +42,9 @@ app.use(
     saveUninitialized: false,
   }),
 );
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

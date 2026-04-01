@@ -1,11 +1,26 @@
 import { Router } from "express";
+import passport from "passport";
 import { generateTokens } from "../utils/jwt.js";
 import { comparePassword } from "../utils/auth.js";
 import { validateLogin } from "../middlewares/validator.middleware.js";
 import userModel from "../models/user.model.js";
-
 const router = Router();
 
+// PASSORT GITHUB
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] }),
+);
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req,res)=>{
+    res.redirect('/api/users/profile')
+  }
+);
+
+// LOGIN
 router.post("/login", validateLogin, async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -27,13 +42,11 @@ router.post("/login", validateLogin, async (req, res) => {
       email: user.email,
     };
 
-    res
-      .status(200)
-      .json({
-        message: "Sesion iniciada",
-        accessToken,
-        user: req.session.user,
-      });
+    res.status(200).json({
+      message: "Sesion iniciada",
+      accessToken,
+      user: req.session.user,
+    });
   } catch (error) {
     res
       .status(500)

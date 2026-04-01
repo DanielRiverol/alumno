@@ -1,4 +1,4 @@
-import passport, { use } from "passport";
+import passport from "passport";
 import userModel from "../models/user.model.js";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { env } from "../config/env.js";
@@ -18,11 +18,12 @@ const initializePassport = () => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile._json.email || `${profile.username}@github.com`;
-          let user = await userModel.find({ email });
+          let user = await userModel.findOne({ email });
+
           if (!user) {
             user = await userModel.create({
               email: email,
-              password: "password_generico",
+              password: "oauth_github_user",
             });
           }
           return done(null, user);
@@ -32,19 +33,19 @@ const initializePassport = () => {
       },
     ),
   );
+
+  passport.serializeUser((user, done) => {
+    done(null, user._id);
+  });
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await userModel.findById(id).select("-password");
+      
+      done(null, user);
+    } catch (error) {
+      done(error, null);
+    }
+  });
 };
-
-passport.serializeUser((user, done) => {
-  done(null, user._id); // depende de la db que use
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await userModel.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-});
 
 export default initializePassport;
