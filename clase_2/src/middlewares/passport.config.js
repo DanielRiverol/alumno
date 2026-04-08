@@ -20,14 +20,24 @@ const initializePassport = () => {
       },
       async (req, email, password, done) => {
         try {
+          let userRole = "user";
+          // array de usuerios que vana ser admin
+          if (email === "admin@mail.com") {
+            userRole = "admin";
+          }
           const user = await userModel.findOne({ email });
+
           //  verifico si existe TODO(en revision)
           if (user)
             return done(null, false, { message: "El usuario ya existe" });
 
           //  creo un nuevo usuario
           const passHash = await hashPassword(password);
-          const newUser = await userModel.create({ email, password: passHash });
+          const newUser = await userModel.create({
+            email,
+            password: passHash,
+            role: userRole,
+          });
 
           return done(null, newUser);
         } catch (error) {
