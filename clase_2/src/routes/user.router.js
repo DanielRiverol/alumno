@@ -9,7 +9,7 @@ const authenticate = passport.authenticate(["jwt", "session"], {
 });
 const requireAdmin = [authenticate, authorizeRoles([])];
 const requireUser = [authenticate, authorizeRoles(["user"])];
-const requireVip = [authenticate, authorizeRoles(["premium"])];
+const requirePremium = [authenticate, authorizeRoles(["premium"])];
 const requireAll = [authenticate, authorizeRoles(["user", "premium"])];
 
 router.get("/", requireAdmin, async (req, res) => {
