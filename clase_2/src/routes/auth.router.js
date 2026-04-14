@@ -56,7 +56,7 @@ router.post("/login", validateLogin, async (req, res) => {
 
 router.post("/logout", async (req, res) => {
   req.session.destroy((err) => {
-    if (err) return res.status(500).json({ message: "Error al cerra sesion" });
+    if (err) return res.status(500).json({ message: "Error al cerrar sesion" });
     res.clearCookie("connect.sid");
     res.status(200).json({ message: "Sesion cerrada" });
   });
