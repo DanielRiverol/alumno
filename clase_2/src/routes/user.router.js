@@ -1,6 +1,5 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
-// import { hashPassword } from "../utils/auth.js";
 import { authorizeRoles } from "../middlewares/auth.middleware.js";
 import passport from "passport";
 const router = Router();
@@ -10,8 +9,8 @@ const authenticate = passport.authenticate(["jwt", "session"], {
 });
 const requireAdmin = [authenticate, authorizeRoles([])];
 const requireUser = [authenticate, authorizeRoles(["user"])];
-const requireVip = [authenticate, authorizeRoles(["vip"])];
-const requireAll = [authenticate, authorizeRoles(["user", "vip"])];
+const requireVip = [authenticate, authorizeRoles(["premium"])];
+const requireAll = [authenticate, authorizeRoles(["user", "premium"])];
 
 router.get("/", requireAdmin, async (req, res) => {
   try {
