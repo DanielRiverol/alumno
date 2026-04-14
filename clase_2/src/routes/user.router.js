@@ -1,6 +1,6 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
-import { authorizeRoles } from "../middlewares/auth.middleware.js";
+import { authorizeRoles,registerGuard } from "../middlewares/auth.middleware.js";
 import passport from "passport";
 const router = Router();
 
@@ -60,7 +60,7 @@ router.get("/profile", requireAll, async (req, res) => {
 //v2 passport-local
 router.post(
   "/",
-  passport.authenticate("register", { session: false }),
+  registerGuard,
   async (req, res) => {
     try {
       res

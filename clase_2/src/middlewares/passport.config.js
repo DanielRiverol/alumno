@@ -29,7 +29,7 @@ const initializePassport = () => {
 
           //  verifico si existe TODO(en revision)
           if (user)
-            return done(null, false, { message: "El usuario ya existe" });
+            return done(null, false, { message: "El usuario ya existe amigo" });
 
           //  creo un nuevo usuario
           const passHash = await hashPassword(password);
@@ -51,7 +51,11 @@ const initializePassport = () => {
     "jwt",
     new JwtStrategy(
       {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: ExtractJwt.fromExtractors([
+          cookieExtractor,
+          ExtractJwt.fromAuthHeaderAsBearerToken(),
+        ]),
         secretOrKey: env.jwt_secret,
       },
       async (jwt_payload, done) => {
@@ -110,5 +114,11 @@ const initializePassport = () => {
     }
   });
 };
-
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies["accessToken"];
+  }
+  return token;
+};
 export default initializePassport;

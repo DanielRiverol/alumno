@@ -19,6 +19,9 @@ const secret = env.session_secret;
 const fileStore = FileStore(session);
 
 // middlewares
+initializePassport();
+app.use(passport.initialize());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -42,8 +45,7 @@ app.use(
     saveUninitialized: false,
   }),
 );
-initializePassport();
-app.use(passport.initialize());
+
 app.use(passport.session());
 //routes
 app.use("/api/auth", authRoutes);
