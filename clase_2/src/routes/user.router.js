@@ -1,16 +1,16 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
-import { authorizeRoles,registerGuard } from "../middlewares/auth.middleware.js";
+import { authorizeRoles,registerGuard, passportAuthGuard } from "../middlewares/auth.middleware.js";
 import passport from "passport";
 const router = Router();
 
-const authenticate = passport.authenticate(["jwt", "session"], {
-  session: false,
-});
-const requireAdmin = [authenticate, authorizeRoles([])];
-const requireUser = [authenticate, authorizeRoles(["user"])];
-const requirePremium = [authenticate, authorizeRoles(["premium"])];
-const requireAll = [authenticate, authorizeRoles(["user", "premium"])];
+// const authenticate = passport.authenticate(["jwt", "session"], {
+//   session: false,
+// });
+const requireAdmin = [passportAuthGuard, authorizeRoles([])];
+const requireUser = [passportAuthGuard, authorizeRoles(["user"])];
+const requirePremium = [passportAuthGuard, authorizeRoles(["premium"])];
+const requireAll = [passportAuthGuard, authorizeRoles(["user", "premium"])];
 
 router.get("/", requireAdmin, async (req, res) => {
   try {
@@ -74,10 +74,18 @@ router.post(
   },
 );
 
+// USUARIO PREMIUM
+router.get("/premium-content", requirePremium, (req, res) => {
+  res.status(200).json({
+    message: "¡Bienvenido a la zona VIP!",
+    benefit: "Aquí tienes acceso a descargas ilimitadas y soporte prioritario.",
+    user: req.user.email,
+  });
+});
+
 router.delete(
   "/:id",
-  passport.authenticate(["jwt", "session"], { session: false }),
-  authorizeRoles([]),
+  requireAdmin,
   async (req, res) => {
     try {
       const user = await userModel.findByIdAndDelete(req.params.id);

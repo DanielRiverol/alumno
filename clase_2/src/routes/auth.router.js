@@ -4,6 +4,7 @@ import { generateTokens } from "../utils/jwt.js";
 import { comparePassword } from "../utils/auth.js";
 import { validateLogin } from "../middlewares/validator.middleware.js";
 import userModel from "../models/user.model.js";
+import { env } from "../config/env.js";
 const router = Router();
 
 // PASSORT GITHUB
@@ -15,9 +16,9 @@ router.get(
 router.get(
   "/github/callback",
   passport.authenticate("github", { failureRedirect: "/login" }),
-  (req,res)=>{
-    res.redirect('/api/users/profile')
-  }
+  (req, res) => {
+    res.redirect("/api/users/profile");
+  },
 );
 
 // LOGIN
@@ -31,9 +32,16 @@ router.post("/login", validateLogin, async (req, res) => {
       return res.status(401).json({ message: "Email o passowod invalidos" });
     // TOKENS
     const { accessToken, refreshToken } = generateTokens(user);
-    res.cookie("refresToken", refreshToken, {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: env.mode === "production",
+      sameSite: "lax", //'strict'
+      maxAge: 7 * 24 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.mode === "production",
+      sameSite: "lax", //'strict'
       maxAge: 7 * 24 * 60 * 1000,
     });
     //
@@ -44,7 +52,7 @@ router.post("/login", validateLogin, async (req, res) => {
 
     res.status(200).json({
       message: "Sesion iniciada",
-      accessToken,
+
       user: req.session.user,
     });
   } catch (error) {
@@ -58,6 +66,8 @@ router.post("/logout", async (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ message: "Error al cerrar sesion" });
     res.clearCookie("connect.sid");
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
     res.status(200).json({ message: "Sesion cerrada" });
   });
 });

@@ -27,7 +27,7 @@ const initializePassport = () => {
           }
           const user = await userModel.findOne({ email });
 
-          //  verifico si existe TODO(en revision)
+          
           if (user)
             return done(null, false, { message: "El usuario ya existe amigo" });
 
