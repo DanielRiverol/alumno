@@ -9,6 +9,7 @@ import userRoutes from "./routes/user.router.js";
 import authRoutes from "./routes/auth.router.js";
 import connectDb from "./config/db.js";
 import initializePassport from "./middlewares/passport.config.js";
+import { globalErrorHandler } from "./middlewares/errorHandler.js";
 import { env } from "./config/env.js";
 // console.log(env);
 
@@ -61,7 +62,8 @@ app.use((req, res) => {
     message: `La ruta ${req.method} ${req.originalUrl} no existe`,
   });
 });
-
+// manejador de errors
+app.use(globalErrorHandler);
 //listeners
 connectDb();
 app.listen(app.get("PORT"), () => {
