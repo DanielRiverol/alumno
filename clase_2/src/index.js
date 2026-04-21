@@ -54,6 +54,14 @@ app.get("/", (req, res) => {
   res.json({ title: "Home Page" });
 });
 
+// Error 404 = Rutas no existentes
+app.use((req, res) => {
+  res.status(404).json({
+    error: "No encontrado",
+    message: `La ruta ${req.method} ${req.originalUrl} no existe`,
+  });
+});
+
 //listeners
 connectDb();
 app.listen(app.get("PORT"), () => {

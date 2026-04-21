@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import { generateTokens } from "../utils/jwt.js";
+import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
 import { comparePassword } from "../utils/auth.js";
 import { validateLogin } from "../middlewares/validator.middleware.js";
 import userModel from "../models/user.model.js";
@@ -39,14 +39,12 @@ router.post("/login", validateLogin, async (req, res) => {
 
     const isMobile = req.body.client === "mobile";
     if (isMobile) {
-      return res
-        .status(200)
-        .json({
-          message: "Login exitos (Mobile)",
-          accessToken,
-          refreshToken,
-          user: req.session.user,
-        });
+      return res.status(200).json({
+        message: "Login exitoso (Mobile)",
+        accessToken,
+        refreshToken,
+        user: req.session.user,
+      });
     }
 
     res.cookie("accessToken", accessToken, {
@@ -76,24 +74,38 @@ router.post("/login", validateLogin, async (req, res) => {
 });
 
 // Refresh token
-router.post('/refresh', async(req,res)=>{
-  const token= req.cookies?.refreshToken || req.body?.refreshToken
+router.post("/refresh", async (req, res) => {
+  const token = req.cookies?.refreshToken || req.body?.refreshToken;
 
-  if(!token)return res.status(401).json({message: "No hay refreshToken"})
+  if (!token) return res.status(401).json({ message: "No hay refreshToken" });
 
-    try {
-      
+  try {
+    const decoded = verifyRefreshToken(token);
 
-      const {accessToken} =generateTokens(user)
+    const user = await userModel.findById(decoded.id || decoded._id);
 
+    if (!user) return res.status(401).json({ message: "No hay usuario" });
 
+    // Aca generamos el nuevo token
 
+    const { accessToken } = generateTokens(user);
 
-      
-    } catch (error) {
-      res.status(403).json({ message: "Refresh token inválido o expirado." });
-    }
-})
+    const isMobile = req.body?.client === "mobile";
+    if (isMobile) return res.status(200).json({ accessToken });
+
+    // MODO WEB
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: env.mode === "production",
+      sameSite: "lax", //'strict'
+      maxAge: 7 * 24 * 60 * 1000,
+    });
+
+    res.status(200).json({ message: " Sesion renovada correctamente" });
+  } catch (error) {
+    res.status(403).json({ message: "Refresh token inválido o expirado." });
+  }
+});
 
 // Logout
 router.post("/logout", async (req, res) => {
