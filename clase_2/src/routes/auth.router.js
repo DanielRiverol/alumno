@@ -32,6 +32,23 @@ router.post("/login", validateLogin, async (req, res) => {
       return res.status(401).json({ message: "Email o passowod invalidos" });
     // TOKENS
     const { accessToken, refreshToken } = generateTokens(user);
+    req.session.user = {
+      id: user._id,
+      email: user.email,
+    };
+
+    const isMobile = req.body.client === "mobile";
+    if (isMobile) {
+      return res
+        .status(200)
+        .json({
+          message: "Login exitos (Mobile)",
+          accessToken,
+          refreshToken,
+          user: req.session.user,
+        });
+    }
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: env.mode === "production",
@@ -45,10 +62,6 @@ router.post("/login", validateLogin, async (req, res) => {
       maxAge: 7 * 24 * 60 * 1000,
     });
     //
-    req.session.user = {
-      id: user._id,
-      email: user.email,
-    };
 
     res.status(200).json({
       message: "Sesion iniciada",
@@ -62,6 +75,27 @@ router.post("/login", validateLogin, async (req, res) => {
   }
 });
 
+// Refresh token
+router.post('/refresh', async(req,res)=>{
+  const token= req.cookies?.refreshToken || req.body?.refreshToken
+
+  if(!token)return res.status(401).json({message: "No hay refreshToken"})
+
+    try {
+      
+
+      const {accessToken} =generateTokens(user)
+
+
+
+
+      
+    } catch (error) {
+      res.status(403).json({ message: "Refresh token inválido o expirado." });
+    }
+})
+
+// Logout
 router.post("/logout", async (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ message: "Error al cerrar sesion" });
@@ -71,4 +105,5 @@ router.post("/logout", async (req, res) => {
     res.status(200).json({ message: "Sesion cerrada" });
   });
 });
+
 export default router;

@@ -1,12 +1,13 @@
 import { Router } from "express";
 import userModel from "../models/user.model.js";
-import { authorizeRoles,registerGuard, passportAuthGuard } from "../middlewares/auth.middleware.js";
+import {
+  authorizeRoles,
+  registerGuard,
+  passportAuthGuard,
+} from "../middlewares/auth.middleware.js";
 import passport from "passport";
 const router = Router();
 
-// const authenticate = passport.authenticate(["jwt", "session"], {
-//   session: false,
-// });
 const requireAdmin = [passportAuthGuard, authorizeRoles([])];
 const requireUser = [passportAuthGuard, authorizeRoles(["user"])];
 const requirePremium = [passportAuthGuard, authorizeRoles(["premium"])];
@@ -58,21 +59,17 @@ router.get("/profile", requireAll, async (req, res) => {
 // });
 
 //v2 passport-local
-router.post(
-  "/",
-  registerGuard,
-  async (req, res) => {
-    try {
-      res
-        .status(201)
-        .json({ message: "Usuario creado correctamente", payload: req.user });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error interno del servidor", error: error.message });
-    }
-  },
-);
+router.post("/", registerGuard, async (req, res) => {
+  try {
+    res
+      .status(201)
+      .json({ message: "Usuario creado correctamente", payload: req.user });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error interno del servidor", error: error.message });
+  }
+});
 
 // USUARIO PREMIUM
 router.get("/premium-content", requirePremium, (req, res) => {
@@ -83,19 +80,16 @@ router.get("/premium-content", requirePremium, (req, res) => {
   });
 });
 
-router.delete(
-  "/:id",
-  requireAdmin,
-  async (req, res) => {
-    try {
-      const user = await userModel.findByIdAndDelete(req.params.id);
-      if (!user)
-        return res.status(404).json({ message: "Usuario no encontrado" });
-      res.json({ message: "Usuario eliminado exitosamente" });
-    } catch (error) {
-      res.status(500).json({ error: "Error al eliminar" });
-    }
-  },
-);
+// Delete (RUTA ADMIN)
+router.delete("/:id", requireAdmin, async (req, res) => {
+  try {
+    const user = await userModel.findByIdAndDelete(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    res.json({ message: "Usuario eliminado exitosamente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar" });
+  }
+});
 
 export default router;
