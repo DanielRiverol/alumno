@@ -1,6 +1,6 @@
 import { Router } from "express";
 // import userModel from "../models/user.model.js";
-import { getAll, getProfile, create, getPremium } from "../controllers/user.controller.js";
+import { getAll, getProfile, create, getPremium, deleteUser } from "../controllers/user.controller.js";
 import {
   authorizeRoles,
   registerGuard,
@@ -24,10 +24,6 @@ router.post("/", registerGuard, create);
 router.get("/premium-content", requirePremium, getPremium);
 
 // Delete (RUTA ADMIN)
-router.delete("/:id", requireAdmin, async (req, res) => {
-  const user = await userModel.findByIdAndDelete(req.params.id);
-  if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
-  res.json({ message: "Usuario eliminado exitosamente" });
-});
+router.delete("/:id", requireAdmin, deleteUser);
 
 export default router;

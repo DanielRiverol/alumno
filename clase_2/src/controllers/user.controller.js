@@ -26,3 +26,9 @@ export const getPremium = async (req, res) => {
     user: req.user.email,
   });
 };
+
+export const deleteUser = async (req, res) => {
+  const user = await userModel.findByIdAndDelete(req.params.id);
+  if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+  res.json({ message: "Usuario eliminado exitosamente" });
+};
