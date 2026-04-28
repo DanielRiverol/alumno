@@ -1,5 +1,5 @@
 import passport from "passport";
-import userModel from "../models/user.model.js";
+import userModel from "../api/v1/models/user.model.js";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";

@@ -5,7 +5,7 @@ import {
   authorizeRoles,
   registerGuard,
   passportAuthGuard,
-} from "../middlewares/auth.middleware.js";
+} from "../../../middlewares/auth.middleware.js";
 
 const router = Router();
 

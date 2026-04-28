@@ -8,7 +8,6 @@ export const getAll = async (req, res) => {
   res.status(200).json({ message: "Lista de usuarios", payload: users });
 };
 
-
 export const getProfile = async (req, res) => {
   res.status(200).json({ message: "Perfil del usuario", payload: req.user });
 };

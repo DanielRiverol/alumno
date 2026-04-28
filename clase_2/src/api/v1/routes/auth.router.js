@@ -1,10 +1,10 @@
 import { Router } from "express";
 import passport from "passport";
-import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
-import { comparePassword } from "../utils/auth.js";
-import { validateLogin } from "../middlewares/validator.middleware.js";
+import { generateTokens, verifyRefreshToken } from "../../../utils/jwt.js";
+import { comparePassword } from "../../../utils/auth.js";
+import { validateLogin } from "../../../middlewares/validator.middleware.js";
 import userModel from "../models/user.model.js";
-import { env } from "../config/env.js";
+import { env } from "../../../config/env.js";
 const router = Router();
 
 // PASSORT GITHUB
