@@ -8,5 +8,6 @@ export default async function connectDb() {
     console.log("Conexion establecida");
   } catch (error) {
     console.error(`Error al conectarse a la db: ${error.message} `);
+    process.exit(1)
   }
 }

@@ -7,6 +7,7 @@ import FileStore from "session-file-store";
 import MongoStore from "connect-mongo";
 import userRoutes from "./api/v1/routes/user.router.js";
 import authRoutes from "./api/v1/routes/auth.router.js";
+import systemRoutes from "./api/v1/routes/system.router.js";
 import connectDb from "./config/db.js";
 import initializePassport from "./middlewares/passport.config.js";
 import { globalErrorHandler } from "./middlewares/errorHandler.js";
@@ -51,6 +52,7 @@ app.use(passport.session());
 //routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/system", systemRoutes);
 // app.use("/api/v2/users", userRoutesV2);
 app.get("/", (req, res) => {
   res.json({ title: "Home Page" });
